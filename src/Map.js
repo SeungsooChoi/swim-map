@@ -10,7 +10,6 @@ class Map extends React.Component {
   state = {
     latitude: 37.3595704,
     longitude: 127.105399,
-    map: null,
   };
 
   getGeolocation = async () => {
