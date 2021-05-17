@@ -26,6 +26,15 @@ class Map extends React.Component {
       map.panTo(
         window.naver.maps.LatLng(this.state.latitude, this.state.longitude)
       );
+
+      // 현재 위치에 마커 표시
+      const currentPosition = new window.naver.maps.Marker({
+        position: new window.naver.maps.LatLng(
+          this.state.latitude,
+          this.state.longitude
+        ),
+        map: map,
+      });
     } else {
       /* 위치정보 사용 불가능 */
       console.log("위치정보 사용 불가능");
@@ -54,7 +63,7 @@ class Map extends React.Component {
         this.state.latitude,
         this.state.longitude
       ),
-      zoom: 13,
+      zoom: 15,
     });
   };
 
