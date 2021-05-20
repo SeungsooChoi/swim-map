@@ -7,10 +7,15 @@ dotenv.config();
 let map = null;
 
 class Map extends React.Component {
-  state = {
-    latitude: 37.3595704,
-    longitude: 127.105399,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      latitude: 37.3595704,
+      longitude: 127.105399,
+      swimmingPoolArr: [],
+      username: null,
+    };
+  }
 
   getGeolocation = async () => {
     console.log("위치정보 가져오는 중...");
@@ -41,22 +46,52 @@ class Map extends React.Component {
     }
   };
 
+  getGeocode = (data) => {
+    const row = data[1].row;
+    const config = {
+      headers: {
+        "X-NCP-APIGW-API-KEY-ID": process.env.REACT_APP_NAVER_CLIENT_ID,
+        "X-NCP-APIGW-API-KEY": process.env.REACT_APP_NAVRR_CLIENT_SECRET,
+      },
+    };
+
+    row.forEach((element) => {
+      console.log(element);
+      // const geocode = axios.get(
+      //   `${process.env.REACT_APP_NAVER_GEOCODE_URL}?query=${element.REFINE_ROADNM_ADDR}`,
+      //   config
+      // );
+
+      // console.log(geocode);
+    });
+  };
+
   loadSwimmingPoolData = async () => {
     console.log("수영장 정보 가져오는 중..");
 
-    await axios
-      .get(
+    try {
+      const {
+        data: { PublicSwimmingPool: poolData },
+      } = await axios.get(
         `${process.env.REACT_APP_SWIMMING_POOL_API_URL}?KEY=${process.env.REACT_APP_SWIMMING_POOL_API_KEY}&Type=json&pIndex=1&pSize=100`
-      )
-      .then(function (response) {
-        // handle success
-        console.log(response);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      });
+      );
+
+      // 얻어온 수영장들 geocode로 좌표 알아내기
+      this.getGeocode(poolData);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  connectBackend = async () => {
+    const {
+      data: { username },
+    } = await axios.get(
+      `http://localhost:${process.env.REACT_APP_SERVER_PORT}/`
+    );
+    this.setState({ username });
+  };
+
   paintingMap = () => {
     map = new window.naver.maps.Map("map", {
       center: new window.naver.maps.LatLng(
@@ -67,21 +102,26 @@ class Map extends React.Component {
     });
   };
 
-  componentDidMount() {
+  componentDidMount = () => {
     // 내 위치 가져오기
-    this.getGeolocation();
+    // this.getGeolocation();
 
     // 수영장 데이터 가져오기
-    this.loadSwimmingPoolData();
+    // this.loadSwimmingPoolData();
+
+    // backend test
+    this.connectBackend();
 
     // 지도 그리기
-    this.paintingMap();
-  }
+    // this.paintingMap();
+  };
 
   render() {
+    const { username } = this.state;
     return (
       <div id="map" className="map">
         Swim-Map
+        {username ? `Hello ${username}` : "Hello World"}
       </div>
     );
   }
