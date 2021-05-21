@@ -46,24 +46,37 @@ class Map extends React.Component {
     }
   };
 
-  getGeocode = (data) => {
-    const row = data[1].row;
-    const config = {
-      headers: {
-        "X-NCP-APIGW-API-KEY-ID": process.env.REACT_APP_NAVER_CLIENT_ID,
-        "X-NCP-APIGW-API-KEY": process.env.REACT_APP_NAVRR_CLIENT_SECRET,
-      },
-    };
+  // getGeocode = (data) => {
+  //   const row = data[1].row;
+  //   const config = {
+  //     headers: {
+  //       "X-NCP-APIGW-API-KEY-ID": process.env.REACT_APP_NAVER_CLIENT_ID,
+  //       "X-NCP-APIGW-API-KEY": process.env.REACT_APP_NAVRR_CLIENT_SECRET,
+  //     },
+  //   };
 
-    row.forEach((element) => {
-      console.log(element);
-      // const geocode = axios.get(
-      //   `${process.env.REACT_APP_NAVER_GEOCODE_URL}?query=${element.REFINE_ROADNM_ADDR}`,
-      //   config
-      // );
+  //   row.forEach((element) => {
+  //     console.log(element);
+  //     // const geocode = axios.get(
+  //     //   `${process.env.REACT_APP_NAVER_GEOCODE_URL}?query=${element.REFINE_ROADNM_ADDR}`,
+  //     //   config
+  //     // );
 
-      // console.log(geocode);
-    });
+  //     // console.log(geocode);
+  //   });
+  // };
+
+  connectBackend = async (poolData) => {
+    const dataAddr = poolData[1].row;
+
+    axios
+      .post(`http://localhost:${process.env.REACT_APP_SERVER_PORT}`, dataAddr)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   loadSwimmingPoolData = async () => {
@@ -76,20 +89,10 @@ class Map extends React.Component {
         `${process.env.REACT_APP_SWIMMING_POOL_API_URL}?KEY=${process.env.REACT_APP_SWIMMING_POOL_API_KEY}&Type=json&pIndex=1&pSize=100`
       );
 
-      // 얻어온 수영장들 geocode로 좌표 알아내기
-      this.getGeocode(poolData);
+      this.connectBackend(poolData);
     } catch (error) {
       console.log(error);
     }
-  };
-
-  connectBackend = async () => {
-    const {
-      data: { username },
-    } = await axios.get(
-      `http://localhost:${process.env.REACT_APP_SERVER_PORT}/`
-    );
-    this.setState({ username });
   };
 
   paintingMap = () => {
@@ -103,25 +106,20 @@ class Map extends React.Component {
   };
 
   componentDidMount = () => {
+    // 지도 그리기
+    this.paintingMap();
+
     // 내 위치 가져오기
-    // this.getGeolocation();
+    this.getGeolocation();
 
     // 수영장 데이터 가져오기
-    // this.loadSwimmingPoolData();
-
-    // backend test
-    this.connectBackend();
-
-    // 지도 그리기
-    // this.paintingMap();
+    this.loadSwimmingPoolData();
   };
 
   render() {
-    const { username } = this.state;
     return (
       <div id="map" className="map">
         Swim-Map
-        {username ? `Hello ${username}` : "Hello World"}
       </div>
     );
   }
