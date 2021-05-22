@@ -66,7 +66,7 @@ class Map extends React.Component {
   //   });
   // };
 
-  connectBackend = async (poolData) => {
+  connectBackend = (poolData) => {
     const dataAddr = poolData[1].row;
 
     axios
