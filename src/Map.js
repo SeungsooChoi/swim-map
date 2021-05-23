@@ -39,6 +39,12 @@ class Map extends React.Component {
           this.state.longitude
         ),
         map: map,
+        title: "myLocation",
+        icon: {
+          content: ['<div class="map__marker--me">', "🙋‍♂️", "</div>"].join(""),
+          size: new window.naver.maps.Size(38, 58),
+          anchor: new window.naver.maps.Point(19, 58),
+        },
       });
     } else {
       /* 위치정보 사용 불가능 */
@@ -46,33 +52,23 @@ class Map extends React.Component {
     }
   };
 
-  // getGeocode = (data) => {
-  //   const row = data[1].row;
-  //   const config = {
-  //     headers: {
-  //       "X-NCP-APIGW-API-KEY-ID": process.env.REACT_APP_NAVER_CLIENT_ID,
-  //       "X-NCP-APIGW-API-KEY": process.env.REACT_APP_NAVRR_CLIENT_SECRET,
-  //     },
-  //   };
-
-  //   row.forEach((element) => {
-  //     console.log(element);
-  //     // const geocode = axios.get(
-  //     //   `${process.env.REACT_APP_NAVER_GEOCODE_URL}?query=${element.REFINE_ROADNM_ADDR}`,
-  //     //   config
-  //     // );
-
-  //     // console.log(geocode);
-  //   });
-  // };
-
   connectBackend = (poolData) => {
     const dataAddr = poolData[1].row;
 
     axios
       .post(`http://localhost:${process.env.REACT_APP_SERVER_PORT}`, dataAddr)
       .then((response) => {
-        console.log(response);
+        const { data } = response;
+        // 가져온 response에 대한 지도 마커
+        data.forEach((data) => {
+          if (data.length > 0) {
+            const current = data[0];
+            let marker = new window.naver.maps.Marker({
+              position: new window.naver.maps.LatLng(current.y, current.x),
+              map: map,
+            });
+          }
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -117,11 +113,7 @@ class Map extends React.Component {
   };
 
   render() {
-    return (
-      <div id="map" className="map">
-        Swim-Map
-      </div>
-    );
+    return <div id="map" className="map"></div>;
   }
 }
 

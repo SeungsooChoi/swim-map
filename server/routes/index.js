@@ -3,7 +3,6 @@ const router = express.Router();
 const axios = require("axios");
 const dotenv = require("dotenv");
 dotenv.config();
-let addrList = [];
 
 const getGeocode = async (address) => {
   try {
@@ -24,20 +23,9 @@ const getGeocode = async (address) => {
   }
 };
 
+// Naver Geocode를 사용하여 주소로 좌표 변환
 const makeArr = async (data) => {
-  // Naver Geocoding 적용할 부분만 고르기
-  //   data.forEach(async (element, idx) => {
-  //     if (idx == 0) {
-  //       await getGeocode(element.REFINE_LOTNO_ADDR);
-  //     }
-  //     if (element.REFINE_LOTNO_ADDR !== null) {
-  //       await getGeocode(element.REFINE_LOTNO_ADDR);
-  //     } else if (element.REFINE_ROADNM_ADDR !== null) {
-  //       await getGeocode(element.REFINE_ROADNM_ADDR);
-  //     } else {
-  //       console.log(`정보없음`);
-  //     }
-  //   });
+  let addrList = [];
 
   for (const item of data) {
     if (item.REFINE_LOTNO_ADDR !== null) {
@@ -45,16 +33,16 @@ const makeArr = async (data) => {
     } else if (item.REFINE_ROADNM_ADDR !== null) {
       addrList.push(await getGeocode(item.REFINE_ROADNM_ADDR));
     } else {
-      console.log(`정보없음`);
     }
   }
-  console.log(addrList);
+
+  return addrList;
 };
 
 router.post("/", (req, res) => {
   const { body } = req;
 
-  makeArr(body);
+  makeArr(body).then((addrList) => res.send(addrList));
 });
 
 module.exports = router;
