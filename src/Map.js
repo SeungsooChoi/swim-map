@@ -97,6 +97,17 @@ class Map extends React.Component {
         this.state.latitude,
         this.state.longitude
       ),
+      zoomControl: true,
+      zoomControlOptions: {
+        style: window.naver.maps.ZoomControlStyle.SMALL,
+        position: window.naver.maps.Position.TOP_RIGHT,
+      },
+      mapTypeControl: true,
+      mapTypeControlOptions: {
+        style: window.naver.maps.MapTypeControlStyle.BUTTON,
+        position: window.naver.maps.Position.TOP_RIGHT,
+      },
+      minZoom: 6,
       zoom: 15,
     });
   };
