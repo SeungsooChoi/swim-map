@@ -1,4 +1,8 @@
 # Swim-map
 
-> 경기도에서 운영하는 수영장을 보여주는 지도
-> A map showing swimming pools operated by Gyeonggi-do Province.
+경기도 공공 수영장 지도 > 전국 수영장 지도
+[ ] class components -> functional components
+[ ] Home
+[ ] SideBar
+[ ] Search
+[ ] Detail
