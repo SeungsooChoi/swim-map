@@ -5,16 +5,17 @@ import axios from "axios";
 import styled from "styled-components";
 dotenv.config();
 
-const Container = styled.div`
+// naver map api로 인해 전역 변수로 관리
+let mapObj = null;
+
+const MapContainer = styled.div`
   width: 100%;
   height: 100vh;
 `;
 
-let mapObj = null;
-
 function App() {
   const [location, setLocation] = useState({});
-  const [swimmingPoolArr, setSwimmingPoolArr] = useState([]);
+  const [publicSwimmingPool, setPublicSwimmingPool] = useState([]);
 
   const paintingMap = () => {
     mapObj = new window.naver.maps.Map("map", {
@@ -33,7 +34,7 @@ function App() {
         position: window.naver.maps.Position.TOP_RIGHT,
       },
       minZoom: 6,
-      zoom: 15,
+      zoom: 10,
     });
   };
 
@@ -78,25 +79,37 @@ function App() {
 
     try {
       const {
-        data: { PublicSwimmingPool: poolData },
+        data: { PublicSwimmingPool },
       } = await axios.get(
         `${process.env.REACT_APP_SWIMMING_POOL_API_URL}?KEY=${process.env.REACT_APP_SWIMMING_POOL_API_KEY}&Type=json&pIndex=1&pSize=100`
       );
 
-      getSwimmingPool(poolData);
+      const [resultType, code] =
+        PublicSwimmingPool[0].head[1].RESULT.CODE.split("-");
+
+      if (resultType === "INFO" && code === "000") {
+        console.log("수영장 데이터 받아옴");
+        getSwimmingPoolGeocode(PublicSwimmingPool[1].row);
+      } else {
+        new Error(resultType);
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getSwimmingPool = (poolData) => {
-    const dataAddr = poolData[1].row;
+  const getSwimmingPoolGeocode = (swimmingPoolDataArr) => {
+    console.log("수영장 데이터 geoCode 시작");
+
+    const dataAddr = swimmingPoolDataArr;
 
     axios
       .post(`http://localhost:${process.env.REACT_APP_SERVER_PORT}`, dataAddr)
       .then((response) => {
         const { data } = response;
-        setSwimmingPoolArr(data);
+        console.log("수영장 데이터 geoCode 완료");
+
+        setPublicSwimmingPool(data);
       })
       .catch((error) => {
         console.log(error);
@@ -104,23 +117,26 @@ function App() {
   };
 
   const paintMarker = () => {
-    // // 가져온 response에 대한 지도 마커
-    // data.forEach((data) => {
-    //   if (data.length > 0) {
-    //     const current = data[0];
-    //     const marker = new window.naver.maps.Marker({
-    //       position: new window.naver.maps.LatLng(current.y, current.x),
-    //       map: mapObj,
-    //     });
-    //     window.naver.maps.Event.addListener(marker, "click", function (e) {
-    //       if (infowindow.getMap()) {
-    //         infowindow.close();
-    //       } else {
-    //         infowindow.open(mapObj, marker);
-    //       }
-    //     });
-    //   }
-    // });
+    if (publicSwimmingPool.length > 0) {
+      let data = publicSwimmingPool;
+      // 가져온 response에 대한 지도 마커
+      data.forEach((data) => {
+        if (data.length > 0) {
+          const current = data[0];
+          const marker = new window.naver.maps.Marker({
+            position: new window.naver.maps.LatLng(current.y, current.x),
+            map: mapObj,
+          });
+          // window.naver.maps.Event.addListener(marker, "click", function (e) {
+          //   if (infowindow.getMap()) {
+          //     infowindow.close();
+          //   } else {
+          //     infowindow.open(mapObj, marker);
+          //   }
+          // });
+        }
+      });
+    }
   };
 
   useEffect(() => {
@@ -139,13 +155,14 @@ function App() {
     makeCurrentPositionMarker();
   }, [location]);
 
+  // 위치 정보가 변경될 때 해당 주소로 화면 이동 및 마커 표시
   useEffect(() => {
     paintMarker();
-  }, [swimmingPoolArr]);
+  }, [publicSwimmingPool]);
 
   return (
     <>
-      <Container id="map" className="map" />
+      <MapContainer id="map" className="map" />
     </>
   );
 }
