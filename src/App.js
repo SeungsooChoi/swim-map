@@ -7,6 +7,8 @@ dotenv.config();
 
 // naver map api로 인해 전역 변수로 관리
 let mapObj = null;
+let markers = [],
+  infoWindows = [];
 
 const MapContainer = styled.div`
   width: 100%;
@@ -15,7 +17,8 @@ const MapContainer = styled.div`
 
 function App() {
   const [location, setLocation] = useState({});
-  const [publicSwimmingPool, setPublicSwimmingPool] = useState([]);
+  const [swimpoolArr, setSwimpoolArr] = useState([]);
+  const [swimpoolGeocodeArr, setSwimpoolGeocodeArr] = useState([]);
 
   const paintingMap = () => {
     mapObj = new window.naver.maps.Map("map", {
@@ -89,6 +92,10 @@ function App() {
 
       if (resultType === "INFO" && code === "000") {
         console.log("수영장 데이터 받아옴");
+
+        // 수영장 데이터 중 도로명, 지번 주소가 없는애들 제외하고 state에 넣음.
+        setSwimpoolArr(filterSwimpool(PublicSwimmingPool[1].row));
+        // 수영장 주소 좌표변환용
         getSwimmingPoolGeocode(PublicSwimmingPool[1].row);
       } else {
         new Error(resultType);
@@ -97,6 +104,10 @@ function App() {
       console.log(error);
     }
   };
+
+  // 수영장 데이터 중 도로명, 지번 주소가 없는애들 제외하고 리턴.
+  const filterSwimpool = (dataArr) =>
+    dataArr.filter((data) => data.REFINE_LOTNO_ADDR || data.REFINE_ROADNM_ADDR);
 
   const getSwimmingPoolGeocode = (swimmingPoolDataArr) => {
     console.log("수영장 데이터 geoCode 시작");
@@ -109,7 +120,7 @@ function App() {
         const { data } = response;
         console.log("수영장 데이터 geoCode 완료");
 
-        setPublicSwimmingPool(data);
+        setSwimpoolGeocodeArr(data);
       })
       .catch((error) => {
         console.log(error);
@@ -117,9 +128,11 @@ function App() {
   };
 
   const paintMarker = () => {
-    if (publicSwimmingPool.length > 0) {
-      let data = publicSwimmingPool;
+    if (swimpoolGeocodeArr.length > 0) {
+      let data = swimpoolGeocodeArr;
       // 가져온 response에 대한 지도 마커
+      console.log(swimpoolArr);
+      console.log(data);
       data.forEach((data) => {
         if (data.length > 0) {
           const current = data[0];
@@ -127,15 +140,24 @@ function App() {
             position: new window.naver.maps.LatLng(current.y, current.x),
             map: mapObj,
           });
-          // window.naver.maps.Event.addListener(marker, "click", function (e) {
-          //   if (infowindow.getMap()) {
-          //     infowindow.close();
-          //   } else {
-          //     infowindow.open(mapObj, marker);
-          //   }
+          // const infoWindow = new window.naver.maps.InfoWindow({
+          //   content: `<div style="width:150px;text-align:center;padding:10px;">The Letter is <b>${key.substr(
+          //     0,
+          //     1
+          //   )}</b>.</div>`,
           // });
+
+          // 전역 마커 배열에 push
+          markers.push(marker);
         }
       });
+      // window.naver.maps.Event.addListener(marker, "click", function (e) {
+      //   if (infowindow.getMap()) {
+      //     infowindow.close();
+      //   } else {
+      //     infowindow.open(mapObj, marker);
+      //   }
+      // });
     }
   };
 
@@ -158,7 +180,7 @@ function App() {
   // 위치 정보가 변경될 때 해당 주소로 화면 이동 및 마커 표시
   useEffect(() => {
     paintMarker();
-  }, [publicSwimmingPool]);
+  }, [swimpoolGeocodeArr]);
 
   return (
     <>
