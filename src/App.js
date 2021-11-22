@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import "./App.css";
 import axios from "axios";
 import styled from "styled-components";
+import { updateMarkers } from "./mapApi";
 dotenv.config();
 
 // naver map api로 인해 전역 변수로 관리
@@ -62,7 +63,7 @@ function App() {
       window.naver.maps.LatLng(location.latitude, location.longitude)
     );
     // 현재 위치에 마커 표시
-    const currentPosition = new window.naver.maps.Marker({
+    let currentMarker = new window.naver.maps.Marker({
       position: new window.naver.maps.LatLng(
         location.latitude,
         location.longitude
@@ -133,31 +134,57 @@ function App() {
       // 가져온 response에 대한 지도 마커
       console.log(swimpoolArr);
       console.log(data);
-      data.forEach((data) => {
+      data.forEach((data, i) => {
         if (data.length > 0) {
           const current = data[0];
-          const marker = new window.naver.maps.Marker({
+          let marker = new window.naver.maps.Marker({
             position: new window.naver.maps.LatLng(current.y, current.x),
             map: mapObj,
           });
-          // const infoWindow = new window.naver.maps.InfoWindow({
-          //   content: `<div style="width:150px;text-align:center;padding:10px;">The Letter is <b>${key.substr(
-          //     0,
-          //     1
-          //   )}</b>.</div>`,
-          // });
+          let infoWindow = new window.naver.maps.InfoWindow({
+            content: `<div>
+                        <h1>${swimpoolArr[i].FACLT_NM}</h1>
+                        <div>
+                          ${
+                            swimpoolArr[i].REGULR_RELYSWIMPL_LENG
+                              ? `
+                              <span>정규경영장 레인 길이 : ${swimpoolArr[i].REGULR_RELYSWIMPL_LENG}(M)</span>
+                              <span>정규경영장 레인 수 : ${swimpoolArr[i].REGULR_RELYSWIMPL_LANE_CNT}(줄)</span>`
+                              : swimpoolArr[i].IRREGULR_RELYSWIMPL_LENG
+                              ? `
+                              <span>비정규경영장 레인 길이 : ${swimpoolArr[i].IRREGULR_RELYSWIMPL_LENG}(M)</span>
+                              <span>비정규경영장 레인 수 : ${swimpoolArr[i].IRREGULR_RELYSWIMPL_LANE_CNT}(줄)</span>`
+                              : `제공되는 레인 길이, 레인 수가 없습니다.`
+                          }
+                          
+                        </div>
+                      </div>`,
+          });
 
           // 전역 마커 배열에 push
           markers.push(marker);
+          infoWindows.push(infoWindow);
         }
       });
-      // window.naver.maps.Event.addListener(marker, "click", function (e) {
-      //   if (infowindow.getMap()) {
-      //     infowindow.close();
-      //   } else {
-      //     infowindow.open(mapObj, marker);
-      //   }
-      // });
+      window.naver.maps.Event.addListener(mapObj, "idle", () =>
+        updateMarkers(mapObj, markers)
+      );
+
+      for (let i = 0; i < markers.length; i++) {
+        window.naver.maps.Event.addListener(markers[i], "click", function () {
+          handleClickMarkers(i);
+        });
+      }
+    }
+  };
+
+  const handleClickMarkers = (seq) => {
+    let marker = markers[seq];
+    let infoWindow = infoWindows[seq];
+    if (infoWindow.getMap()) {
+      infoWindow.close();
+    } else {
+      infoWindow.open(mapObj, marker);
     }
   };
 
@@ -177,7 +204,7 @@ function App() {
     makeCurrentPositionMarker();
   }, [location]);
 
-  // 위치 정보가 변경될 때 해당 주소로 화면 이동 및 마커 표시
+  // 수영장 좌표 변환을 마쳤으면 마커 및 정보 표시
   useEffect(() => {
     paintMarker();
   }, [swimpoolGeocodeArr]);
