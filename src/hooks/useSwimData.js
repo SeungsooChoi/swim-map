@@ -1,5 +1,6 @@
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { actionCreators } from "../modules/mapReducer";
 
 const useSwimData = () => {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ const useSwimData = () => {
         const { data } = response;
         console.log("수영장 데이터 geoCode 완료");
 
-        console.log(data);
+        dispatch(actionCreators.setPoolList(data));
       })
       .catch((error) => {
         console.log(error);

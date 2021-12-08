@@ -3,6 +3,7 @@
  */
 const SET_MAP = "setMap";
 const SET_POOL_LIST = "setPoolList";
+const ADD_MARKER = "addMarker";
 
 /**
  * setMap action 생성 함수
@@ -21,11 +22,19 @@ const setPoolList = (poolList) => {
   };
 };
 
+const addMarker = (marker) => {
+  return {
+    type: ADD_MARKER,
+    marker,
+  };
+};
+
 const mapReducer = (
   state = {
     swimMap: {
       map: null,
       poolList: [],
+      marker: [],
     },
   },
   action
@@ -48,6 +57,14 @@ const mapReducer = (
           poolList: action.poolList,
         },
       };
+    case ADD_MARKER:
+      return {
+        ...state,
+        swimMap: {
+          ...state.swimMap,
+          marker: action.marker,
+        },
+      };
     default:
       return state;
   }
@@ -56,6 +73,7 @@ const mapReducer = (
 export const actionCreators = {
   setMap,
   setPoolList,
+  addMarker,
 };
 
 export default mapReducer;
