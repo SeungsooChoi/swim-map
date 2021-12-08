@@ -5,6 +5,7 @@ import useGeolocation from "../hooks/useGeolocation";
 import useSetMarker from "../hooks/useSetMarker";
 import useSwimData from "../hooks/useSwimData";
 import styled from "styled-components";
+import PoolList from "../components/PoolList";
 
 const SwimMap = () => {
   const map = useSelector((state) => state.swimMap.map);
@@ -28,14 +29,16 @@ const SwimMap = () => {
   }, [poolPositionList]);
 
   return (
-    <>
-      {/* <PoolList /> */}
+    <Container>
+      <PoolList />
       <NaverMap />
-    </>
+    </Container>
   );
 };
 
 const Container = styled.div`
   display: flex;
+  width: 100%;
+  height: 100vh;
 `;
 export default SwimMap;
