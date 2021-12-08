@@ -3,6 +3,7 @@
  */
 const SET_MAP = "setMap";
 const SET_POOL_LIST = "setPoolList";
+const SET_POOL_POSITION_LIST = "setPoolPositionList";
 const ADD_MARKER = "addMarker";
 
 /**
@@ -22,6 +23,13 @@ const setPoolList = (poolList) => {
   };
 };
 
+const setPoolPositionList = (poolPositionList) => {
+  return {
+    type: SET_POOL_POSITION_LIST,
+    poolPositionList,
+  };
+};
+
 const addMarker = (marker) => {
   return {
     type: ADD_MARKER,
@@ -33,6 +41,7 @@ const mapReducer = (
   state = {
     swimMap: {
       map: null,
+      poolPositionList: [],
       poolList: [],
       marker: [],
     },
@@ -47,6 +56,14 @@ const mapReducer = (
         swimMap: {
           ...state.swimMap,
           map: action.map,
+        },
+      };
+    case SET_POOL_POSITION_LIST:
+      return {
+        ...state,
+        swimMap: {
+          ...state.swimMap,
+          poolPositionList: action.poolPositionList,
         },
       };
     case SET_POOL_LIST:
@@ -73,6 +90,7 @@ const mapReducer = (
 export const actionCreators = {
   setMap,
   setPoolList,
+  setPoolPositionList,
   addMarker,
 };
 

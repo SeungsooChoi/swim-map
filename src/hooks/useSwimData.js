@@ -20,7 +20,7 @@ const useSwimData = () => {
         const { data } = response;
         console.log("수영장 데이터 geoCode 완료");
 
-        dispatch(actionCreators.setPoolList(data));
+        dispatch(actionCreators.setPoolPositionList(data));
       })
       .catch((error) => {
         console.log(error);
@@ -42,7 +42,7 @@ const useSwimData = () => {
         console.log("수영장 데이터 받아옴");
         // 수영장 데이터 중 도로명, 지번 주소가 없는애들 제외
         const filteredData = filterSwimpool(PublicSwimmingPool[1].row);
-
+        dispatch(actionCreators.setPoolList(filteredData));
         // 수영장 주소 좌표변환
         getSwimmingPoolGeocode(filteredData);
       } else {
