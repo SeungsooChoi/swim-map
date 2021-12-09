@@ -31,22 +31,25 @@ const useSetMarker = () => {
           });
 
           let infoWindow = new naver.maps.InfoWindow({
-            content: `<div>
+            content: `<div class="iw_inner">
                           <h1>${poolList[i].FACLT_NM}</h1>
                           <div>
                             ${
                               poolList[i].REGULR_RELYSWIMPL_LENG
                                 ? `
-                                <span>정규경영장 레인 길이 : ${poolList[i].REGULR_RELYSWIMPL_LENG}(M)</span>
-                                <span>정규경영장 레인 수 : ${poolList[i].REGULR_RELYSWIMPL_LANE_CNT}(줄)</span>`
+                                <div>정규경영장 레인 길이 : ${poolList[i].REGULR_RELYSWIMPL_LENG}(M)</div>
+                                <div>정규경영장 레인 수 : ${poolList[i].REGULR_RELYSWIMPL_LANE_CNT}(줄)</div>`
                                 : poolList[i].IRREGULR_RELYSWIMPL_LENG
                                 ? `
-                                <span>비정규경영장 레인 길이 : ${poolList[i].IRREGULR_RELYSWIMPL_LENG}(M)</span>
-                                <span>비정규경영장 레인 수 : ${poolList[i].IRREGULR_RELYSWIMPL_LANE_CNT}(줄)</span>`
+                                <div>비정규경영장 레인 길이 : ${poolList[i].IRREGULR_RELYSWIMPL_LENG}(M)</div>
+                                <div>비정규경영장 레인 수 : ${poolList[i].IRREGULR_RELYSWIMPL_LANE_CNT}(줄)</div>`
                                 : `제공되는 레인 길이, 레인 수가 없습니다.`
                             }
                           </div>
                         </div>`,
+            borderWidth: 0,
+            disableAnchor: true,
+            backgroundColor: "transparent",
           });
 
           newMarkerArr.push(newMarker);
