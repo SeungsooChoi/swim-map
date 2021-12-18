@@ -10,27 +10,28 @@ const Map = styled.div`
   height: 100vh;
 `;
 
+const options = {
+  center: new naver.maps.LatLng(33.450701, 126.570667),
+  zoomControl: true,
+  zoomControlOptions: {
+    style: naver.maps.ZoomControlStyle.SMALL,
+    position: naver.maps.Position.TOP_RIGHT,
+  },
+  mapTypeControl: true,
+  mapTypeControlOptions: {
+    style: naver.maps.MapTypeControlStyle.BUTTON,
+    position: naver.maps.Position.TOP_RIGHT,
+  },
+  minZoom: 6,
+  zoom: 10,
+};
+
 function NaverMap() {
   const dispatch = useDispatch();
 
   // redux를 사용해서 map 객체를 store에 저장.
   useEffect(() => {
     const container = document.getElementById("map");
-    const options = {
-      center: new naver.maps.LatLng(33.450701, 126.570667),
-      zoomControl: true,
-      zoomControlOptions: {
-        style: naver.maps.ZoomControlStyle.SMALL,
-        position: naver.maps.Position.TOP_RIGHT,
-      },
-      mapTypeControl: true,
-      mapTypeControlOptions: {
-        style: naver.maps.MapTypeControlStyle.BUTTON,
-        position: naver.maps.Position.TOP_RIGHT,
-      },
-      minZoom: 6,
-      zoom: 10,
-    };
     const map = new naver.maps.Map(container, options);
 
     dispatch(actionCreators.setMap(map), [map]);

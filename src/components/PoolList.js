@@ -2,18 +2,14 @@ import React from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 
-const { naver } = window;
-let poolArr = [];
-
 const PoolList = () => {
   const poolList = useSelector((state) => state.swimMap.poolList);
 
-  poolArr = poolList;
   return (
     <Container>
       <h2>경기도 공공 수영장 목록입니다.</h2>
-      {poolArr.length > 0 &&
-        poolArr.map((pool, i) => (
+      {poolList.length > 0 &&
+        poolList.map((pool, i) => (
           <Place key={i}>
             <Title>{pool.FACLT_NM}</Title>
             <Addr>

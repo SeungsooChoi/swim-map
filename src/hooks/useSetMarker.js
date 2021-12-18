@@ -4,8 +4,6 @@ import { actionCreators } from "../modules/mapReducer";
 
 const { naver } = window;
 
-let naverMap = {};
-
 const useSetMarker = () => {
   const { map, poolPositionList, poolList } = useSelector((state) => ({
     map: state.swimMap.map,
@@ -15,6 +13,7 @@ const useSetMarker = () => {
 
   const dispatch = useDispatch();
 
+  let naverMap = {};
   naverMap = map;
 
   const setMarker = () => {
@@ -22,7 +21,8 @@ const useSetMarker = () => {
     let newInfoWindowArr = [];
 
     if (poolPositionList.length > 0) {
-      poolPositionList.map((pool, i) => {
+      poolPositionList.forEach((pool, i) => {
+        // 리스트에 내용이 없을 수 있음
         if (pool.length > 0) {
           const place = pool[0];
           let newMarker = new naver.maps.Marker({
